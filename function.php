@@ -558,10 +558,11 @@
         $cats = json_decode($item['categories'], JSON_OBJECT_AS_ARRAY);
         if (in_array($item2['id'], $cats)) {
           $date = $item['date'];
-          $categories = $item2['name'];
+          $categories .= $item2['name'] . ', ';
           $tags = $item2['keywords'];
         }
       }
+      $categories = substr($categories, 0, -1);
       foreach ($operators as $item2) {
         if ($item2['id'] == $item['operator_id']) {
           $operator = $item2['name'];
