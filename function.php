@@ -58,23 +58,26 @@
       $ids[] = $item['id'];
       $labels[] = $item['name'];
     }
-    $day = 30;
-    if (isset($_POST['date_left']))
-    {
-      if ($_POST['date_left'] == 2) $day = 7;
-      if ($_POST['date_left'] == 3) $day = 0;
-    }
-    $dateLeft = new DateTime('-'.$day.' days');
+
+    $dateLeft_parse = explode('.', $_POST['date_left']);
+    $dateLeft = new DateTime();
+    $dateLeft->setDate($dateLeft_parse[2], $dateLeft_parse[1], $dateLeft_parse[0]);
     $dateLeft = $dateLeft->format('Y-m-d h:i:s');
+    $dateRight_parse = explode('.', $_POST['date_right']);
+    $dateRight = new DateTime();
+    $dateRight->setDate($dateRight_parse[2], $dateRight_parse[1], $dateRight_parse[0]);
+    $dateRight = $dateRight->format('Y-m-d h:i:s');
+
     $categories = [];
-    $audios = $pdo->query('SELECT * FROM audios WHERE categories IN (' . implode(',', $ids) . ')')->fetchAll(PDO::FETCH_ASSOC);
+    $audios = $pdo->query('SELECT * FROM audios WHERE date >= "'.$dateLeft.'" AND date <= "'.$dateRight.'"')->fetchAll(PDO::FETCH_ASSOC);
     $result = array();
     foreach ($category as $item)
     {
       $count = 0;
       foreach ($audios as $item2)
       {
-        if ($item['id'] == $item2['categories'] && strtotime($dateLeft) <= strtotime($item2['date']))
+        $cats = json_decode($item2['categories'], JSON_OBJECT_AS_ARRAY);
+        if (in_array($item['id'], $cats))
         {
           $count++;
         }
@@ -85,18 +88,19 @@
     $labelsRight = [];
     $resultRight = [];
     $category_param = isset($_POST['category']) ? $_POST['category'] : $categories[0]['id'];
-    for ($i = 0; $i < 31; $i++) {
+    for ($i = 0; $i < floatval(date('d', strtotime($dateRight) - strtotime($dateLeft))); $i++) {
       if ($i == 0) {
-        $date = date('Y-m-d');
+        $date = date('Y-m-d', strtotime($dateLeft));
       } else {
-        $date = date('Y-m-d', mktime(0, 0, 0, date('m'), date('d') - $i, date('Y')));
+        $date = date('Y-m-d', mktime(0, 0, 0, date('m', strtotime($dateLeft)), date('d', strtotime($dateLeft)) + $i, date('Y', strtotime($dateLeft))));
       }
       for ($i2 = 0; $i2 < 24; $i2++) {
         $labelsRight[] = $i2 < 10 ? $date . ' 0' . $i2 . ':00' : $date . ' ' . $i2 . ':00';
         $i2sum = $i2 + 1;
         $count = 0;
         foreach ($audios as $item) {
-          if ($category_param == $item['categories']) {
+          $cats = json_decode($item['categories'], JSON_OBJECT_AS_ARRAY);
+          if (in_array($category_param, $cats)) {
             $time_in  = $i2 < 10 ? '0' . $i2 . ':00' : $i2 . ':00';
             $time_out = $i2sum < 10 ? '0' . $i2sum . ':00' : $i2sum . ':00';
             if ($i2 > 23) {
@@ -122,7 +126,7 @@
           'title' => 'График по категориям',
           'chartTitle' => 'Количество взаимодействий по категориям за',
           'color' => 'rgba(54, 162, 235, 1)',
-          'label' => 'Количество'
+          'label' => 'Количество',
         ),
         'right' => array (
           'items' => $labelsRight,
@@ -147,15 +151,17 @@
       $ids[] = $item['id'];
       $labels[] = $item['name'];
     }
-    $day = 30;
-    if (isset($_POST['date_left']))
-    {
-      if ($_POST['date_left'] == 2) $day = 7;
-      if ($_POST['date_left'] == 3) $day = 0;
-    }
-    $dateLeft = new DateTime('-'.$day.' days');
+
+    $dateLeft_parse = explode('.', $_POST['date_left']);
+    $dateLeft = new DateTime();
+    $dateLeft->setDate($dateLeft_parse[2], $dateLeft_parse[1], $dateLeft_parse[0]);
     $dateLeft = $dateLeft->format('Y-m-d h:i:s');
-    $audios = $pdo->query('SELECT * FROM audios WHERE operator_id IN (' . implode(',', $ids) . ') AND date >= "'.$dateLeft.'" AND emotional = 1')->fetchAll(PDO::FETCH_ASSOC);
+    $dateRight_parse = explode('.', $_POST['date_right']);
+    $dateRight = new DateTime();
+    $dateRight->setDate($dateRight_parse[2], $dateRight_parse[1], $dateRight_parse[0]);
+    $dateRight = $dateRight->format('Y-m-d h:i:s');
+
+    $audios = $pdo->query('SELECT * FROM audios WHERE operator_id IN (' . implode(',', $ids) . ') AND date >= "'.$dateLeft.'" AND date <= "'.$dateRight.'" AND emotional = 1')->fetchAll(PDO::FETCH_ASSOC);
     $result = array();
     foreach ($operators as $item)
     {
@@ -177,22 +183,15 @@
       $ids[] = $item['id'];
       $labels2[] = $item['name'];
     }
-    $day2 = 30;
-    if (isset($_POST['date_right']))
-    {
-      if ($_POST['date_right'] == 2) $day2 = 7;
-      if ($_POST['date_right'] == 3) $day2 = 0;
-    }
-    $dateRight = new DateTime('-'.$day2.' days');
-    $dateRight = $dateRight->format('Y-m-d h:i:s');
-    $audios = $pdo->query('SELECT * FROM audios WHERE categories IN (' . implode(',', $ids) . ') AND date >= "'.$dateRight.'" AND emotional = 1')->fetchAll(PDO::FETCH_ASSOC);
+    $audios = $pdo->query('SELECT * FROM audios WHERE date >= "'.$dateLeft.'" AND date <= "'.$dateRight.'" AND emotional = 1')->fetchAll(PDO::FETCH_ASSOC);
     $result2 = array();
     foreach ($categories as $item)
     {
       $count = 0;
       foreach ($audios as $item2)
       {
-        if ($item['id'] == $item2['categories'] && strtotime($dateRight) <= strtotime($item2['date']))
+        $cats = json_decode($item2['categories'], JSON_OBJECT_AS_ARRAY);
+        if (in_array($item['id'], $cats))
         {
            $count++;
         }
@@ -235,15 +234,17 @@
       $ids[] = $item['id'];
       $labels[] = $item['name'];
     }
-    $day = 30;
-    if (isset($_POST['date_left']))
-    {
-      if ($_POST['date_left'] == 2) $day = 7;
-      if ($_POST['date_left'] == 3) $day = 0;
-    }
-    $dateLeft = new DateTime('-'.$day.' days');
+
+    $dateLeft_parse = explode('.', $_POST['date_left']);
+    $dateLeft = new DateTime();
+    $dateLeft->setDate($dateLeft_parse[2], $dateLeft_parse[1], $dateLeft_parse[0]);
     $dateLeft = $dateLeft->format('Y-m-d h:i:s');
-    $audios = $pdo->query('SELECT * FROM audios WHERE operator_id IN (' . implode(',', $ids) . ') AND date >= "'.$dateLeft.'"')->fetchAll(PDO::FETCH_ASSOC);
+    $dateRight_parse = explode('.', $_POST['date_right']);
+    $dateRight = new DateTime();
+    $dateRight->setDate($dateRight_parse[2], $dateRight_parse[1], $dateRight_parse[0]);
+    $dateRight = $dateRight->format('Y-m-d h:i:s');
+
+    $audios = $pdo->query('SELECT * FROM audios WHERE operator_id IN (' . implode(',', $ids) . ') AND date >= "'.$dateLeft.'" AND date <= "'.$dateRight.'"')->fetchAll(PDO::FETCH_ASSOC);
     $result = array();
     foreach ($operators as $item)
     {
@@ -303,15 +304,8 @@
       $ids[] = $item['id'];
       $labels2[] = $item['name'];
     }
-    $day2 = 30;
-    if (isset($_POST['date_right']))
-    {
-      if ($_POST['date_right'] == 2) $day2 = 7;
-      if ($_POST['date_right'] == 3) $day2 = 0;
-    }
-    $dateRight = new DateTime('-'.$day2.' days');
-    $dateRight = $dateRight->format('Y-m-d h:i:s');
-    $audios = $pdo->query('SELECT * FROM audios WHERE categories IN (' . implode(',', $ids) . ') AND date >= "'.$dateRight.'"')->fetchAll(PDO::FETCH_ASSOC);
+
+    $audios = $pdo->query('SELECT * FROM audios WHERE date >= "'.$dateLeft.'" AND date <= "'.$dateRight.'"')->fetchAll(PDO::FETCH_ASSOC);
     $result2 = array();
     foreach ($categories as $item)
     {
@@ -319,7 +313,8 @@
       $all_count = 0;
       foreach ($audios as $item2)
       {
-        if ($item['id'] == $item2['categories'])
+        $cats = json_decode($item2['categories'], JSON_OBJECT_AS_ARRAY);
+        if (in_array($item['id'], $cats))
         {
           if ($item2['pauses'] != '')
           {
@@ -374,15 +369,17 @@
       $ids[] = $item['id'];
       $labels[] = $item['name'];
     }
-    $day = 30;
-    if (isset($_POST['date_left']))
-    {
-      if ($_POST['date_left'] == 2) $day = 7;
-      if ($_POST['date_left'] == 3) $day = 0;
-    }
-    $dateLeft = new DateTime('-'.$day.' days');
+
+    $dateLeft_parse = explode('.', $_POST['date_left']);
+    $dateLeft = new DateTime();
+    $dateLeft->setDate($dateLeft_parse[2], $dateLeft_parse[1], $dateLeft_parse[0]);
     $dateLeft = $dateLeft->format('Y-m-d h:i:s');
-    $audios = $pdo->query('SELECT operator_id, AVG(duration)as duration FROM audios WHERE operator_id IN (' . implode(',', $ids) . ') AND date >= "'.$dateLeft.'" GROUP BY operator_id')->fetchAll(PDO::FETCH_ASSOC);
+    $dateRight_parse = explode('.', $_POST['date_right']);
+    $dateRight = new DateTime();
+    $dateRight->setDate($dateRight_parse[2], $dateRight_parse[1], $dateRight_parse[0]);
+    $dateRight = $dateRight->format('Y-m-d h:i:s');
+
+    $audios = $pdo->query('SELECT operator_id, AVG(duration)as duration FROM audios WHERE operator_id IN (' . implode(',', $ids) . ') AND date >= "'.$dateLeft.'" AND date <= "'.$dateRight.'" GROUP BY operator_id')->fetchAll(PDO::FETCH_ASSOC);
     $result = array();
     foreach ($operators as $item)
     {
@@ -402,21 +399,15 @@
       $ids[] = $item['id'];
       $labels2[] = $item['name'];
     }
-    $day2 = 30;
-    if (isset($_POST['date_right']))
-    {
-      if ($_POST['date_right'] == 2) $day2 = 7;
-      if ($_POST['date_right'] == 3) $day2 = 0;
-    }
-    $dateRight = new DateTime('-'.$day2.' days');
-    $dateRight = $dateRight->format('Y-m-d h:i:s');
-    $audios = $pdo->query('SELECT categories, AVG(duration)as duration FROM audios WHERE categories IN (' . implode(',', $ids) . ') AND date >= "'.$dateRight.'" GROUP BY categories')->fetchAll(PDO::FETCH_ASSOC);
+
+    $audios = $pdo->query('SELECT categories, AVG(duration)as duration FROM audios WHERE date >= "'.$dateLeft.'" AND date <= "'.$dateRight.'" GROUP BY categories')->fetchAll(PDO::FETCH_ASSOC);
     $result2 = array();
     foreach ($categories as $item)
     {
       foreach ($audios as $item2)
       {
-        if ($item['id'] == $item2['categories'])
+        $cats = json_decode($item2['categories'], JSON_OBJECT_AS_ARRAY);
+        if (in_array($item['id'], $cats))
         {
           $result2[] = round($item2['duration'] / 60000, 2);
         }
@@ -497,9 +488,9 @@
           }
         }
         if ($_POST['param'] == 'emotional') {
-          $array = $pdo->query('SELECT * FROM audios WHERE categories=' . $filter . ' AND emotional=1')->fetchAll(PDO::FETCH_ASSOC);
+          $array = $pdo->query("SELECT * FROM audios WHERE categories LIKE '%" . $filter . "%' AND emotional=1")->fetchAll(PDO::FETCH_ASSOC);
         } else if ($_POST['param'] == 'pauses') {
-          $query = $pdo->query('SELECT * FROM audios WHERE categories=' . $filter)->fetchAll(PDO::FETCH_ASSOC);
+          $query = $pdo->query("SELECT * FROM audios WHERE categories LIKE '%" . $filter . "%'")->fetchAll(PDO::FETCH_ASSOC);
           $array = array();
           foreach ($query as $item) {
             $times = json_decode($item['pauses'], JSON_OBJECT_AS_ARRAY);
@@ -510,10 +501,10 @@
               }
             }
           }
-        } else if ($_POST['param'] == 'duration'){ //BAG TEMP 
-          $array = $pdo->query('SELECT *, categories, AVG(duration) as duration FROM audios WHERE categories=' . $filter . ' GROUP BY categories')->fetchAll(PDO::FETCH_ASSOC);
+        } else if ($_POST['param'] == 'duration'){ //BAG TEMP
+          $array = $pdo->query("SELECT *, categories, AVG(duration) as duration FROM audios WHERE categories LIKE '%" . $filter . "%' GROUP BY categories")->fetchAll(PDO::FETCH_ASSOC);
         } else {
-          $array = $pdo->query('SELECT * FROM audios WHERE categories=' . $filter)->fetchAll(PDO::FETCH_ASSOC);
+          $array = $pdo->query("SELECT * FROM audios WHERE categories LIKE '%" . $filter . "%'")->fetchAll(PDO::FETCH_ASSOC);
         }
       }
       //endOf filter=category
@@ -544,7 +535,7 @@
               }
             }
           }
-        } else if ($_POST['param'] == 'duration') { //BAG TEMP 
+        } else if ($_POST['param'] == 'duration') { //BAG_TEMP
           $array = $pdo->query('SELECT *, categories, AVG(duration) as duration FROM audios WHERE operator_id=' . $filter . ' GROUP BY categories')->fetchAll(PDO::FETCH_ASSOC);
         } else {
           $array = $pdo->query('SELECT * FROM audios WHERE operator_id=' . $filter)->fetchAll(PDO::FETCH_ASSOC);
@@ -564,7 +555,8 @@
       $tags = '';
       $operator = '';
       foreach ($categorys as $item2) {
-        if ($item2['id'] == $item['categories']) {
+        $cats = json_decode($item['categories'], JSON_OBJECT_AS_ARRAY);
+        if (in_array($item2['id'], $cats)) {
           $date = $item['date'];
           $categories = $item2['name'];
           $tags = $item2['keywords'];

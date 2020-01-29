@@ -43,8 +43,9 @@ $(function(){
   $('.filter').on('change', function() {
     filter_id = $(this).val();
     setFilter();
-    getDataLeft('type=' + $(this).val());
-    getDataRight('type=' + $(this).val());
+    let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');
+    getDataLeft('type=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1]);
+    getDataRight('type=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1]);
   })
 
   let chartLeftElem = null;
@@ -181,19 +182,10 @@ $(function(){
     }
   }
 
-  $('.dateLeft').change(function(){
-    let params = 'type=' + $('.filter').val() + '&date_left=' + $(this).val();
-    getDataLeft(params);
-  });
-
-  $('.dateRight').change(function(){
-    let params = 'type=' + $('.filter').val() + '&date_right=' + $(this).val();
-    getDataRight(params);
-  });
-
   $('#select_cat').change(function(){
     categories_sel = $(this).val();
-    let params = 'type=' + $('.filter').val() + '&category=' + $(this).val();
+    let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');  
+    let params = 'type=' + $('.filter').val() + '&category=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1];
     getDataRight(params);
   });
 
@@ -202,9 +194,24 @@ $(function(){
       window.open('interaction.php?scroll&id='+id, '_blank');
   });
 
+  $('.date_min_max').on('apply.daterangepicker', function(ev, picker) {
+    let params = 'type=' + $('.filter').val() + '&date_left=' + picker.startDate.format('DD.MM.YYYY') + '&date_right=' + picker.endDate.format('DD.MM.YYYY');
+    getDataLeft(params);
+    getDataRight(params);
+  });
 
+  $('.date_min_max').daterangepicker({
+    timePicker: false,
+    minDate: moment().startOf('hour').add(-7, 'day'),
+    maxDate: moment().startOf('hour'),
+    startDate: moment().startOf('hour').add(-7, 'day'),
+    endDate: moment().startOf('hour'),
+    locale: {
+      format: 'DD.MM.YYYY'
+    }
+  });
 
-  function getTable (params = '' ,chart = 0) { 
+  function getTable (params = '' ,chart = 0) {
     let filter = '';
     if (params != '') {
       if (chart == 0) {
@@ -249,9 +256,9 @@ $(function(){
   }
 
   setFilter();
-
-  getDataLeft();
-  getDataRight();
+  let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');
+  getDataLeft('type=' + $('.filter').val() + '&date_left=' + dates[0] + '&date_right=' + dates[1]);
+  getDataRight('type=' + $('.filter').val() + '&date_left=' + dates[1] + '&date_right=' + dates[1]);
 
   getTable();
 });

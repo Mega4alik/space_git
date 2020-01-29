@@ -59,16 +59,22 @@
               </div>
             </div>
             <div class="row">
+              <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 p-v-sm">
+                <div class="row">
+                  <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2" style="padding-top: 0.3rem;">
+                    Даты фильтрации
+                  </div>
+                  <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
+                    <input type="text" style="width: 100%; padding: 0.2rem 1rem;" class="date_min_max" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
               <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 p-v-lg">
                 <div class="panel">
                   <div class="chartTitleLeft">Количество взаимодействий по категориям за: </div>
-                  <div class="p-v-md">
-                    <select class="form-control m-v-sm dateLeft">
-                      <option value="1" default>Последний месяц</option>
-                      <option value="2">Последнюю неделю</option>
-                      <option value="3">Последний день</option>
-                    </select>
-                  </div>
+                  <div class="p-v-md"></div>
                   <div class="chartBarLeft" style="height: 25rem"></div>
                 </div>
               </div>
@@ -76,11 +82,6 @@
                 <div class="panel">
                   <div class="chartTitleRight">Количество взаимодействий по категориям за: </div>
                   <div class="p-v-md">
-                    <select class="form-control m-v-sm dateRight" id="select_day" style="display: none">
-                      <option value="1" default>Последний месяц</option>
-                      <option value="2">Последнюю неделю</option>
-                      <option value="3">Последний день</option>
-                    </select>
                     <select class="form-control m-v-sm" id="select_cat"></select>
                   </div>
                   <div class="chartBarRight" style="height: 25rem"></div>
