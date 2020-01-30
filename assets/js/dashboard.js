@@ -184,7 +184,7 @@ $(function(){
 
   $('#select_cat').change(function(){
     categories_sel = $(this).val();
-    let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');  
+    let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');
     let params = 'type=' + $('.filter').val() + '&category=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1];
     getDataRight(params);
   });
@@ -202,7 +202,6 @@ $(function(){
 
   $('.date_min_max').daterangepicker({
     timePicker: false,
-    minDate: moment().startOf('hour').add(-7, 'day'),
     maxDate: moment().startOf('hour'),
     startDate: moment().startOf('hour').add(-7, 'day'),
     endDate: moment().startOf('hour'),
