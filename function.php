@@ -400,8 +400,9 @@
       $labels2[] = $item['name'];
     }
 
-    $audios = $pdo->query('SELECT categories, AVG(duration)as duration FROM audios WHERE date >= "'.$dateLeft.'" AND date <= "'.$dateRight.'" GROUP BY categories')->fetchAll(PDO::FETCH_ASSOC);
+    $audios = $pdo->query('SELECT * FROM audios WHERE date >= "'.$dateLeft.'" AND date <= "'.$dateRight.'"')->fetchAll(PDO::FETCH_ASSOC);
     $result2 = array();
+    $avg_num = array();
     foreach ($categories as $item)
     {
       foreach ($audios as $item2)
@@ -409,8 +410,16 @@
         $cats = json_decode($item2['categories'], JSON_OBJECT_AS_ARRAY);
         if (in_array($item['id'], $cats))
         {
-          $result2[] = round($item2['duration'] / 60000, 2);
+          $avg_num[$item['id']][] = $item2['duration'];
         }
+      }
+      if (isset($avg_num[$item['id']]))
+      {
+        $result2[] = round(array_sum($avg_num[$item['id']]) / count($avg_num[$item['id']]) / 60000, 2);
+      }
+      else
+      {
+        $result2[] = 0;
       }
     }
 
