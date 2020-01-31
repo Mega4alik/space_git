@@ -571,12 +571,13 @@
           $tags = $item2['keywords'];
         }
       }
-      $categories = substr($categories, 0, -1);
+      $categories = substr($categories, 0, -2);
       foreach ($operators as $item2) {
         if ($item2['id'] == $item['operator_id']) {
           $operator = $item2['name'];
         }
       }
+      $item['duration'] = round($item['duration'] / 60000, 2) . ' мин';
       $array2 = array($item['id'], $item['name'], $operator, $date, $item['duration'], $emotional, $categories, $tags);
       $result[] = $array2;
     }
