@@ -106,17 +106,19 @@ $(function(){
   function createRightCharts(){
     $('.chartBarRight').html('<div id="chartBarRight" class="w-full"></div>');
     var chartRight = echarts.init(document.getElementById('chartBarRight'));
+    /*
     if (filter_id == 0) {
       optionR.xAxis[0].data = chartRightLabels;
       optionR.series = [{name: chartRightLabel, type: 'line', data: chartRightDatas}];
       optionR.dataZoom = [{startValue: '2014-06-01'}, {type: 'inside'}];
-    } else {
+    } else {}
+    */
       delete optionR.dataZoom;
       optionR.color = ['#3398DB'];
       optionR.title.text = chartRightTitle;
       optionR.xAxis[0].data = chartRightLabels;
       optionR.series = [{name: chartRightLabel, type: 'bar', barWidth: '60%', data: chartRightDatas}];
-    }
+
     chartRight.setOption(optionR);
     chartRight.on('click', function (params) {
       getTable(params, 1);

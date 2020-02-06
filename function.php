@@ -85,39 +85,31 @@
       $categories[] = array('id' => $item['id'], 'name' => $item['name']);
       $result[] = $count;
     }
+    $labelsTemp = [];
+    $counts = [];
     $labelsRight = [];
     $resultRight = [];
     $category_param = isset($_POST['category']) ? $_POST['category'] : $categories[0]['id'];
-    for ($i = 0; $i < floatval(date('d', strtotime($dateRight) - strtotime($dateLeft))); $i++) {
-      if ($i == 0) {
-        $date = date('Y-m-d', strtotime($dateLeft));
-      } else {
-        $date = date('Y-m-d', mktime(0, 0, 0, date('m', strtotime($dateLeft)), date('d', strtotime($dateLeft)) + $i, date('Y', strtotime($dateLeft))));
-      }
-      for ($i2 = 0; $i2 < 24; $i2++) {
-        $labelsRight[] = $i2 < 10 ? $date . ' 0' . $i2 . ':00' : $date . ' ' . $i2 . ':00';
-        $i2sum = $i2 + 1;
-        $count = 0;
-        foreach ($audios as $item) {
-          $cats = json_decode($item['categories'], JSON_OBJECT_AS_ARRAY);
-          if (in_array($category_param, $cats)) {
-            $time_in  = $i2 < 10 ? '0' . $i2 . ':00' : $i2 . ':00';
-            $time_out = $i2sum < 10 ? '0' . $i2sum . ':00' : $i2sum . ':00';
-            if ($i2 > 23) {
-              $datesum = date('Y-m-d', mktime(0, 0, 0, date('m'), date('d') + 1, date('Y')));
-              if (strtotime($item['date']) > strtotime($date . ' ' . $time_in) && strtotime($item['date']) < strtotime($datesum . ' 00:00')) {
-               $count++;
-              }
-            } else {
-              if (strtotime($item['date']) >= strtotime($date . ' ' . $time_in) && strtotime($item['date']) <= strtotime($date . ' ' . $time_out)) {
-               $count++;
-              }
-            }
-          }
+    foreach ($audios as $item) {
+      $cats = json_decode($item['categories'], JSON_OBJECT_AS_ARRAY);
+      if (in_array($category_param, $cats)) {
+        if (array_key_exists(date('d.m.Y', strtotime($item['date'])), $labelsTemp))
+        {
+          $count = $count + 1;
         }
-        $resultRight[] = $count;
+        else
+        {
+          $count = 1;
+        }
+        $labelsTemp[date('d.m.Y', strtotime($item['date']))] = $count;
       }
     }
+    foreach ($labelsTemp as $k => $v)
+    {
+      $labelsRight[] = $k;
+      $resultRight[] = $v;
+    }
+
     return json_encode(
       array(
         'left' => array(
