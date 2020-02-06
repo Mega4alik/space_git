@@ -579,7 +579,8 @@
       }
       $item['duration'] = round($item['duration'] / 60000, 2) . ' мин';
       $array2 = array($item['id'], $item['name'], $operator, $date, $item['duration'], $emotional, $categories, $tags);
-      $result[] = $array2;
+
+      if (!empty($item['info'])) $result[] = $array2;
     }
 
 

@@ -22,7 +22,7 @@
 
 
 <link href="./assets/css/space.min.css" rel="stylesheet">
-<link href="./assets/css/custom.css" rel="stylesheet">
+<link href="./assets/css/custom.css?version=2" rel="stylesheet">
 
 
 <script src="./assets/js/echarts.min.js"></script>

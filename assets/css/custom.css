@@ -5,3 +5,7 @@
 #chartBarRight{
   height: 25rem;
 }
+
+#example td{
+	cursor: pointer;
+}
