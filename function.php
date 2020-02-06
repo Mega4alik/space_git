@@ -486,6 +486,15 @@
     $categorys = $pdo->query('SELECT * FROM categories')->fetchAll(PDO::FETCH_ASSOC);
     $operators = $pdo->query('SELECT * FROM operators')->fetchAll(PDO::FETCH_ASSOC);
 
+    $dateLeft_parse = explode('.', $_POST['date_left']);
+    $dateLeft = new DateTime();
+    $dateLeft->setDate($dateLeft_parse[2], $dateLeft_parse[1], $dateLeft_parse[0]);
+    $dateLeft = $dateLeft->format('Y-m-d h:i:s');
+    $dateRight_parse = explode('.', $_POST['date_right']);
+    $dateRight = new DateTime();
+    $dateRight->setDate($dateRight_parse[2], $dateRight_parse[1], $dateRight_parse[0]);
+    $dateRight = $dateRight->format('Y-m-d h:i:s');
+
     if (!empty($_POST['filter']) && !empty($_POST['name'])){
       //filter=category
       if ($_POST['filter'] == 'category'){
@@ -497,9 +506,9 @@
           }
         }
         if ($_POST['param'] == 'emotional') {
-          $array = $pdo->query("SELECT * FROM audios WHERE categories LIKE '%" . $filter . "%' AND emotional=1")->fetchAll(PDO::FETCH_ASSOC);
+          $array = $pdo->query("SELECT * FROM audios WHERE categories LIKE '%" . $filter . "%' AND emotional=1 AND date >= '".$dateLeft."' AND date <= '".$dateRight."'")->fetchAll(PDO::FETCH_ASSOC);
         } else if ($_POST['param'] == 'pauses') {
-          $query = $pdo->query("SELECT * FROM audios WHERE categories LIKE '%" . $filter . "%'")->fetchAll(PDO::FETCH_ASSOC);
+          $query = $pdo->query("SELECT * FROM audios WHERE categories LIKE '%" . $filter . "%' AND date >= '".$dateLeft."' AND date <= '".$dateRight."'")->fetchAll(PDO::FETCH_ASSOC);
           $array = array();
           foreach ($query as $item) {
             $times = json_decode($item['pauses'], JSON_OBJECT_AS_ARRAY);
@@ -511,9 +520,9 @@
             }
           }
         } else if ($_POST['param'] == 'duration'){ //BAG TEMP
-          $array = $pdo->query("SELECT *, categories, AVG(duration) as duration FROM audios WHERE categories LIKE '%" . $filter . "%' GROUP BY categories")->fetchAll(PDO::FETCH_ASSOC);
+          $array = $pdo->query("SELECT *, categories, AVG(duration) as duration FROM audios WHERE categories LIKE '%" . $filter . "%' AND date >= '".$dateLeft."' AND date <= '".$dateRight."' GROUP BY categories")->fetchAll(PDO::FETCH_ASSOC);
         } else {
-          $array = $pdo->query("SELECT * FROM audios WHERE categories LIKE '%" . $filter . "%'")->fetchAll(PDO::FETCH_ASSOC);
+          $array = $pdo->query("SELECT * FROM audios WHERE categories LIKE '%" . $filter . "%' AND date >= '".$dateLeft."' AND date <= '".$dateRight."'")->fetchAll(PDO::FETCH_ASSOC);
         }
       }
       //endOf filter=category
@@ -528,9 +537,9 @@
           }
         }
         if ($_POST['param'] == 'emotional'){
-          $array = $pdo->query('SELECT * FROM audios WHERE operator_id=' . $filter . ' AND emotional=1')->fetchAll(PDO::FETCH_ASSOC);
+          $array = $pdo->query("SELECT * FROM audios WHERE operator_id=".$filter." AND emotional=1 AND date >= '".$dateLeft."' AND date <= '".$dateRight."'")->fetchAll(PDO::FETCH_ASSOC);
         } else if ($_POST['param'] == 'pauses') {
-          $query = $pdo->query('SELECT * FROM audios WHERE operator_id=' . $filter)->fetchAll(PDO::FETCH_ASSOC);
+          $query = $pdo->query("SELECT * FROM audios WHERE operator_id=".$filter." AND date >= '".$dateLeft."' AND date <= '".$dateRight."'")->fetchAll(PDO::FETCH_ASSOC);
           $array = array();
           foreach ($query as $item) {
             if ($item['pauses'] != '')
@@ -545,15 +554,15 @@
             }
           }
         } else if ($_POST['param'] == 'duration') { //BAG_TEMP
-          $array = $pdo->query('SELECT *, categories, AVG(duration) as duration FROM audios WHERE operator_id=' . $filter . ' GROUP BY categories')->fetchAll(PDO::FETCH_ASSOC);
+          $array = $pdo->query("SELECT *, categories, AVG(duration) as duration FROM audios WHERE operator_id=".$filter." AND date >= '".$dateLeft."' AND date <= '".$dateRight."' GROUP BY categories")->fetchAll(PDO::FETCH_ASSOC);
         } else {
-          $array = $pdo->query('SELECT * FROM audios WHERE operator_id=' . $filter)->fetchAll(PDO::FETCH_ASSOC);
+          $array = $pdo->query("SELECT * FROM audios WHERE operator_id=".$filter." AND date >= '".$dateLeft."' AND date <= '".$dateRight."'")->fetchAll(PDO::FETCH_ASSOC);
         }
       }
       //endOf filter=user
 
     } else {
-      $array = $pdo->query('SELECT * FROM audios')->fetchAll(PDO::FETCH_ASSOC);
+      $array = $pdo->query("SELECT * FROM audios WHERE date >= '".$dateLeft."' AND date <= '".$dateRight."'")->fetchAll(PDO::FETCH_ASSOC);
     }
 
 
@@ -563,15 +572,18 @@
       $categories = '';
       $tags = '';
       $operator = '';
+      $date = $item['date'];
       foreach ($categorys as $item2) {
         $cats = json_decode($item['categories'], JSON_OBJECT_AS_ARRAY);
         if (in_array($item2['id'], $cats)) {
-          $date = $item['date'];
           $categories .= $item2['name'] . ', ';
           $tags = $item2['keywords'];
         }
       }
-      $categories = substr($categories, 0, -2);
+      if ($categories != '')
+      {
+        $categories = substr($categories, 0, -2);
+      }
       foreach ($operators as $item2) {
         if ($item2['id'] == $item['operator_id']) {
           $operator = $item2['name'];

@@ -198,6 +198,7 @@ $(function(){
     let params = 'type=' + $('.filter').val() + '&date_left=' + picker.startDate.format('DD.MM.YYYY') + '&date_right=' + picker.endDate.format('DD.MM.YYYY');
     getDataLeft(params);
     getDataRight(params);
+    getTable();
   });
 
   $('.date_min_max').daterangepicker({
@@ -211,21 +212,22 @@ $(function(){
   });
 
   function getTable (params = '' ,chart = 0) {
-    let filter = '';
+    let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');
+        dates = '&date_left=' + dates[0] + '&date_right=' + dates[1];
+    let filter = dates;
     if (params != '') {
       if (chart == 0) {
-        if (filter_id == 0) filter = '&filter=category&name=' + params.name;
-        if (filter_id == 1) filter = '&filter=user&name=' + params.name + '&param=emotional';
-        if (filter_id == 2) filter = '&filter=user&name=' + params.name + '&param=pauses';
-        if (filter_id == 3) filter = '&filter=user&name=' + params.name + '&param=duration';
+        if (filter_id == 0) filter = filter + '&filter=category&name=' + params.name;
+        if (filter_id == 1) filter = filter + '&filter=user&name=' + params.name + '&param=emotional';
+        if (filter_id == 2) filter = filter + '&filter=user&name=' + params.name + '&param=pauses';
+        if (filter_id == 3) filter = filter + '&filter=user&name=' + params.name + '&param=duration';
       } else {
-        if (filter_id == 1) filter = '&filter=category&name=' + params.name + '&param=emotional';
-        if (filter_id == 2) filter = '&filter=category&name=' + params.name + '&param=pauses';
-        if (filter_id == 3) filter = '&filter=category&name=' + params.name + '&param=duration';
+        if (filter_id == 1) filter = filter + '&filter=category&name=' + params.name + '&param=emotional';
+        if (filter_id == 2) filter = filter + '&filter=category&name=' + params.name + '&param=pauses';
+        if (filter_id == 3) filter = filter + '&filter=category&name=' + params.name + '&param=duration';
       }
     }
     posts = 'type=6' + filter;
-    console.log("posts", posts);
     $.ajax({
       type: "POST",
       url: "/function.php",
