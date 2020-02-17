@@ -71,6 +71,17 @@ if ($action == 'getInteraction'){
 	} catch(Exception $e){}
 	*/
     //endOf g_asr
+	$info["categories"] = array();
+    $audio_categories = json_decode($q["categories"], true);
+	$stmt = $db->prepare("SELECT * FROM categories");
+	$stmt->execute();
+	$result = $stmt->fetchAll();
+	foreach($audio_categories as $cat_id)
+		foreach($result as $category){		    
+			if ($cat_id == $category["id"]){
+				$info["categories"][] = $category["name"];
+			}
+	}
 
 	echo json_encode($info);
 }

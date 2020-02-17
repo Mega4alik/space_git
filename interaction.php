@@ -170,9 +170,11 @@
 
                     //categories 
                     html = '';
-                    for (var i=0;i<6;i++)
-                        if (d[i]>0) html+=categories_list[i]+' : <a href>'+d[i]+'</a><br><br>';
+                    if (j.categories) j.categories.forEach(function(category_name){
+                        html+='<div>'+category_name+'</div>';
+                    });
                     $('#categories').html(html);
+                    //endOf categories
                     
                     audioPath = j.path; 
                     wavesurfer.load(audioPath);
