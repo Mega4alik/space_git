@@ -1,6 +1,6 @@
 $(function(){
 
-  let filter_id = 0;
+  let filter_id = -1;
   let optionL = {
     title: {text: '',left: 'center', textStyle: {fontSize: '15', color: '#666'}, padding: 0},
     color: ['#3398DB'],
@@ -48,6 +48,7 @@ $(function(){
       let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');
       getDataLeft('type=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1]);
       getDataRight('type=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1]);
+      getTable();
     }
   })
 
@@ -196,10 +197,12 @@ $(function(){
   }
 
   $('#select_cat').change(function(){
-    categories_sel = $(this).val();
-    let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');
-    let params = 'type=' + $('.filter').val() + '&category=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1];
-    getDataRight(params);
+    if (filter_id > -1) {
+      categories_sel = $(this).val();
+      let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');
+      let params = 'type=' + $('.filter').val() + '&category=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1];
+      getDataRight(params);
+    }
   });
 
   $('#example').on("click", "tr", function(event){
@@ -208,10 +211,12 @@ $(function(){
   });
 
   $('.date_min_max').on('apply.daterangepicker', function(ev, picker) {
-    let params = 'type=' + $('.filter').val() + '&date_left=' + picker.startDate.format('DD.MM.YYYY') + '&date_right=' + picker.endDate.format('DD.MM.YYYY');
-    getDataLeft(params);
-    getDataRight(params);
-    getTable();
+    if (filter_id > -1) {
+      let params = 'type=' + $('.filter').val() + '&date_left=' + picker.startDate.format('DD.MM.YYYY') + '&date_right=' + picker.endDate.format('DD.MM.YYYY');
+      getDataLeft(params);
+      getDataRight(params);
+      getTable();
+    }
   });
 
   $('.date_min_max').daterangepicker({

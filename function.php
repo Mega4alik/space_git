@@ -569,7 +569,6 @@
         $cats = json_decode($item['categories'], JSON_OBJECT_AS_ARRAY);
         if (in_array($item2['id'], $cats)) {
           $categories .= $item2['name'] . ', ';
-          $tags = $item2['keywords'];
         }
       }
       if ($categories != '')
@@ -599,7 +598,7 @@
       {
         $item['duration'] = $item['duration'] . ' сек';
       }
-      $array2 = array($item['id'], $item['name'], $operator, $date, $item['duration'], $emotional, $categories, $tags);
+      $array2 = array($item['id'], $item['name'], $operator, $date, $item['duration'], $emotional, $categories, $item['keywords']);
 
       if (!empty($item['info'])) $result[] = $array2;
     }
