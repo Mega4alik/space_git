@@ -602,7 +602,7 @@
       }
       else
       {
-        $item['duration'] = '0 мин ' . $item['duration'] . ' сек';
+        $item['duration'] = '0 мин ' . floor($item['duration'] / 1000) . ' сек';
       }
       $tags = json_decode($item['keywords'], JSON_OBJECT_AS_ARRAY);
       $tags_str = '';
