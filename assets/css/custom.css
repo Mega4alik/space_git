@@ -9,3 +9,13 @@
 #example td{
 	cursor: pointer;
 }
+.chartTitleRight{
+  float: left;
+  width: 20%;
+}
+.chartTitleForm{
+  position: absolute;
+  right: 35px;
+  top: 1.4rem;
+  width: calc(80% - 50px);
+}

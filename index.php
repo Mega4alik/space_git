@@ -51,7 +51,8 @@
             <div class="row">
               <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12" style="z-index: 9999999999!important">
                 <select class="form-control filter">
-                  <option value="0" default>График по категориям</option>
+                  <option value="-1" default>Не выбрано</option>
+                  <option value="0">График по категориям</option>
                   <option value="1" disabled="true">Повышение голоса, эмоциональные взаимодействия</option>
                   <option value="2" disabled="true">Длительные паузы</option>
                   <option value="3" disabled="true">Продолжительные разговоры</option>
@@ -71,19 +72,21 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 p-v-lg">
+              <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 p-v-lg" style="padding-top: 0">
                 <div class="panel">
                   <div class="chartTitleLeft">Количество взаимодействий по категориям за: </div>
                   <div class="p-v-md"></div>
                   <div class="chartBarLeft" style="height: 25rem"></div>
                 </div>
               </div>
-              <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 p-v-lg">
+              <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 p-v-lg" style="padding-top: 0">
                 <div class="panel">
                   <div class="chartTitleRight">Количество взаимодействий по категориям за: </div>
-                  <div class="p-v-md">
+                  <div class="chartTitleForm">
                     <select class="form-control m-v-sm" id="select_cat"></select>
                   </div>
+                  <div style="clear: both;"></div>
+                  <div class="p-v-md"></div>
                   <div class="chartBarRight" style="height: 25rem"></div>
                 </div>
               </div>

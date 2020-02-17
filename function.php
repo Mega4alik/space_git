@@ -581,7 +581,24 @@
           $operator = $item2['name'];
         }
       }
-      $item['duration'] = round($item['duration'] / 60000, 2) . ' мин';
+      $item['duration'] = //round($item['duration'] / 60000, 2) . '';
+      $min = ($item['duration'] / 3600 - floor($item['duration'] / 3600)) *60;
+      if ($min > 0)
+      {
+        $sec =  ceil(($min - floor($min)) * 60);
+        if ($sec > 0)
+        {
+          $item['duration'] = floor($min) . ' мин ' . $sec . ' сек';
+        }
+        else
+        {
+          $item['duration'] = floor($min) . ' мин';
+        }
+      }
+      else
+      {
+        $item['duration'] = $item['duration'] . ' сек';
+      }
       $array2 = array($item['id'], $item['name'], $operator, $date, $item['duration'], $emotional, $categories, $tags);
 
       if (!empty($item['info'])) $result[] = $array2;

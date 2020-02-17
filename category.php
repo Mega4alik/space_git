@@ -34,10 +34,10 @@
             </div>
             <?php if (isset($_GET['id'])) { ?>
               <div class="row m-b-lg">
-                <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
                   <div class="form-group">
                     <label for="categoryName">Наименование категории</label>
-                    <input type="text" class="form-control" id="categoryName" />
+                    <input type="text" class="form-control" id="categoryName" style="width: 50%;" />
                   </div>
                   <div class="form-group">
                     <label class="categoryTags">Ключевые фразы через запятую</label>
