@@ -580,23 +580,29 @@
           $operator = $item2['name'];
         }
       }
-      $item['duration'] = //round($item['duration'] / 60000, 2) . '';
-      $min = ($item['duration'] / 3600 - floor($item['duration'] / 3600)) *60;
+      //$min = (($item['duration'] + 0) / 3600 - floor(($item['duration'] + 0) / 3600)) *60;
+      $min = ($item['duration'] / 1000) / 60;
       if ($min > 0)
       {
         $sec =  ceil(($min - floor($min)) * 60);
-        if ($sec > 0)
+        if ($sec > 0 && $sec < 59)
         {
           $item['duration'] = floor($min) . ' мин ' . $sec . ' сек';
         }
         else
         {
-          $item['duration'] = floor($min) . ' мин';
+          if ($sec >= 60) {
+            $item['duration'] = '1 мин 0 cек';
+          }
+          else
+          {
+            $item['duration'] = floor($min) . ' мин';
+          }
         }
       }
       else
       {
-        $item['duration'] = $item['duration'] . ' сек';
+        $item['duration'] = '0 мин ' . $item['duration'] . ' сек';
       }
       $tags = json_decode($item['keywords'], JSON_OBJECT_AS_ARRAY);
       $tags_str = '';
