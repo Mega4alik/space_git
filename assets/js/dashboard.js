@@ -1,6 +1,7 @@
 $(function(){
 
-  let filter_id = -1;
+  let filter_id = 0;
+  let block = false;
   let optionL = {
     title: {text: '',left: 'center', textStyle: {fontSize: '15', color: '#666'}, padding: 0},
     color: ['#3398DB'],
@@ -41,15 +42,12 @@ $(function(){
 
 
   $('.filter').on('change', function() {
-    if ($(this).val() > -1) {
-      $('.filter option[value=-1]').attr('disabled', 'disabled');
-      filter_id = $(this).val();
-      setFilter();
-      let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');
-      getDataLeft('type=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1]);
-      getDataRight('type=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1]);
-      getTable();
-    }
+    filter_id = $(this).val();
+    setFilter();
+    let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');
+    getDataLeft('type=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1]);
+    getDataRight('type=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1]);
+    getTable();
   })
 
   let chartLeftElem = null;
@@ -130,7 +128,7 @@ $(function(){
     $('.chartTitleRight').html(chartRightChartTitle);
   }
 
-  function getDataLeft (params = '', start = true) {
+  function getDataLeft (params = '') {
     categories_sel = 0;
     $.ajax({
       type: "POST",
@@ -139,11 +137,7 @@ $(function(){
       success: function(data){
         data = JSON.parse(data);
         chartLeftLabels = data.left.items;
-        if (start) {
-          chartLeftDatas = data.left.datas;
-        } else {
-          chartLeftDatas = [];
-        }
+        chartLeftDatas = data.left.datas;
         chartLeftTitle = data.left.title;
         chartLeftChartTitle = data.left.chartTitle;
         chartLeftColor = data.left.color;
@@ -153,7 +147,7 @@ $(function(){
     });
   }
 
-  function getDataRight (params = '', start = true) {
+  function getDataRight (params = '') {
     $.ajax({
       type: "POST",
       url: "/function.php",
@@ -161,17 +155,20 @@ $(function(){
       success: function(data) {
         data = JSON.parse(data);
         chartRightLabels = data.right.items;
-        if (start) {
-          chartRightDatas = data.right.datas;
-        } else {
-          chartRightDatas = [];
-        }
+        chartRightDatas = data.right.datas;
         chartRightTitle = data.right.title;
         chartRightChartTitle = data.right.chartTitle;
         chartRightColor = data.right.color;
         chartRightLabel = data.right.label;
         categories = data.right.categories ? data.right.categories : [];
         $('#select_cat').html('');
+        let elem = document.createElement('option')
+            elem.value = 0;
+            elem.innerHTML = 'Не выбрано';
+        if (block) {
+          elem.setAttribute('disabled', 'disabled');
+        }
+        $('#select_cat').append(elem);
         categories.forEach(function(item){
           let elem = document.createElement('option')
               elem.value = item.id;
@@ -196,27 +193,24 @@ $(function(){
     }
   }
 
-  $('#select_cat').change(function(){
-    if (filter_id > -1) {
-      categories_sel = $(this).val();
-      let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');
-      let params = 'type=' + $('.filter').val() + '&category=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1];
-      getDataRight(params);
-    }
-  });
-
   $('#example').on("click", "tr", function(event){
       var id = $(this).find('td:first').text();
       window.open('interaction.php?scroll&id='+id, '_blank');
   });
 
   $('.date_min_max').on('apply.daterangepicker', function(ev, picker) {
-    if (filter_id > -1) {
-      let params = 'type=' + $('.filter').val() + '&date_left=' + picker.startDate.format('DD.MM.YYYY') + '&date_right=' + picker.endDate.format('DD.MM.YYYY');
-      getDataLeft(params);
-      getDataRight(params);
-      getTable();
-    }
+    let params = 'type=' + $('.filter').val() + '&date_left=' + picker.startDate.format('DD.MM.YYYY') + '&date_right=' + picker.endDate.format('DD.MM.YYYY');
+    getDataLeft(params);
+    getDataRight(params);
+    getTable();
+  });
+
+  $('#select_cat').change(function(){
+    block = true;
+    categories_sel = $(this).val();
+    let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');
+    let params = 'type=' + $('.filter').val() + '&category=' + $(this).val() + '&date_left=' + dates[0] + '&date_right=' + dates[1];
+    getDataRight(params);
   });
 
   $('.date_min_max').daterangepicker({
@@ -229,7 +223,7 @@ $(function(){
     }
   });
 
-  function getTable (params = '' ,chart = 0, start = true) {
+  function getTable (params = '' ,chart = 0) {
     let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');
         dates = '&date_left=' + dates[0] + '&date_right=' + dates[1];
     let filter = dates;
@@ -246,54 +240,38 @@ $(function(){
       }
     }
     posts = 'type=6' + filter;
-    if (start) {
-      $.ajax({
-        type: "POST",
-        url: "/function.php",
-        data: posts,
-        success: function(data) { //console.log("getTable", data);
-          data = JSON.parse(data);
-          if (table != null) {
-            table.destroy();
-          }
-          table = $('#example').DataTable({
-              data: data,
-              columns: [
-                { title: "#" },
-                { title: "Файл" },
-                { title: "Сотрудник" },
-                { title: "Время загрузки" },
-                { title: "Продолжительность" },
-                { title: "Эмоции" },
-                { title: "Категории" },
-                { title: "Ключевые слова" }
-              ]
-          });
-        }, error:function(err){
-          console.log("getTableErr", err);
+    $.ajax({
+      type: "POST",
+      url: "/function.php",
+      data: posts,
+      success: function(data) { //console.log("getTable", data);
+        data = JSON.parse(data);
+        if (table != null) {
+          table.destroy();
         }
-      });
-    } else {
-      table = $('#example').DataTable({
-          data: [],
-          columns: [
-            { title: "#" },
-            { title: "Файл" },
-            { title: "Сотрудник" },
-            { title: "Время загрузки" },
-            { title: "Продолжительность" },
-            { title: "Эмоции" },
-            { title: "Категории" },
-            { title: "Ключевые слова" }
-          ]
-      });
-    }
+        table = $('#example').DataTable({
+            data: data,
+            columns: [
+              { title: "#" },
+              { title: "Файл" },
+              { title: "Сотрудник" },
+              { title: "Время загрузки" },
+              { title: "Продолжительность" },
+              { title: "Эмоции" },
+              { title: "Категории" },
+              { title: "Ключевые слова" }
+            ]
+        });
+      }, error:function(err){
+        console.log("getTableErr", err);
+      }
+    });
   }
 
   setFilter();
   let dates = $('.date_min_max').val().replace(/\s/g, '').split('-');
-  getDataLeft('type=' + $('.filter').val() + '&date_left=' + dates[0] + '&date_right=' + dates[1], false);
-  getDataRight('type=' + $('.filter').val() + '&date_left=' + dates[1] + '&date_right=' + dates[1], false);
+  getDataLeft('type=' + $('.filter').val() + '&date_left=' + dates[0] + '&date_right=' + dates[1]);
+  getDataRight('type=' + $('.filter').val() + '&date_left=' + dates[1] + '&date_right=' + dates[1]);
 
-  getTable('', 0, false);
+  getTable();
 });

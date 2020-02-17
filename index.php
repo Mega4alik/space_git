@@ -51,7 +51,6 @@
             <div class="row">
               <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12" style="z-index: 9999999999!important">
                 <select class="form-control filter">
-                  <option value="-1" default>Не выбрано</option>
                   <option value="0">График по категориям</option>
                   <option value="1" disabled="true">Повышение голоса, эмоциональные взаимодействия</option>
                   <option value="2" disabled="true">Длительные паузы</option>
