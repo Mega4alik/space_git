@@ -62,6 +62,7 @@
 
         <style>
         #transcriptions span.active{background-color:lightgreen;}
+        #transcriptions .keyphrases{background-color: purple;}
         </style>
 
 
@@ -142,26 +143,30 @@
                     var html = '';                    
                     var d = [0,0,0,0,0,0,0,0,0];
                     var idx = 0;
-                    j.utterances.forEach(function(u){                                                                      
+                    j.utterances.forEach(function(u){
+                        //console.log(u.utteranceKeyphrases," - ", u.utteranceText ? u.utteranceText : "");
                         var wordsHtml = '';
-                        u.words.forEach(function(w){
+                        if (u.words) u.words.forEach(function(w){
                             idx+=1;
                             w.idx = idx; 
                             wordsHtml+='<span id="w'+w.idx+'">'+w.wordText+'</span> ';
                         });
-                        wordsHtml +='<br><i>'+u.alternative+'</i>'; //TEMP?
+                        if (u.utteranceKeyphrases && u.utteranceKeyphrases.length>0 && u.words) u.utteranceKeyphrases.forEach(function(phrase){
+                                wordsHtml+='<span class="label label-info">'+phrase+'</span> ';
+                        });
+                        if (u.alternative) wordsHtml +='<br><i>'+u.alternative+'</i>'; 
                         var timeSt = timeBeautify(u.startTime)+'-'+ timeBeautify(u.startTime+u.duration);
-                        html+='<tr starttime='+u.startTime+' endtime='+(u.startTime+u.duration)+'><td>'+u.speakerId+'</td>'+'<td>'+timeSt+'</td>'+'<td>'+wordsHtml+'</td></tr>';                        
-
+                        html+='<tr starttime='+u.startTime+' endtime='+(u.startTime+u.duration)+'><td>'+u.speakerId+'</td>'+'<td>'+timeSt+'</td>'+
+                        '<td>'+wordsHtml+'</td></tr>';
                         if (u.categories) u.categories.forEach(function(x){
                             d[x.categoryId]+=1;
                         });
                     });
 
-                    UTTERANCES = j.utterances;          
-                    SILENCES = j.long_silences;          
+                    UTTERANCES = j.utterances;
+                    SILENCES = j.long_silences;
                     //console.log(JSON.stringify(SILENCES)) ;                                                            
-                    $('#transcriptions tbody').html(html);                    
+                    $('#transcriptions tbody').html(html);
 
                     //categories 
                     html = '';
