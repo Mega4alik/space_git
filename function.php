@@ -598,7 +598,14 @@
       {
         $item['duration'] = $item['duration'] . ' сек';
       }
-      $array2 = array($item['id'], $item['name'], $operator, $date, $item['duration'], $emotional, $categories, $item['keywords']);
+      $tags = json_decode($item['keywords'], JSON_OBJECT_AS_ARRAY);
+      $tags_str = '';
+      foreach ($tags as $tag)
+      {
+        $tags_str .= $tag . ',';
+      }
+      $tags_str = substr($tags_str, 0, -1);
+      $array2 = array($item['id'], $item['name'], $operator, $date, $item['duration'], $emotional, $categories, $tags_str);
 
       if (!empty($item['info'])) $result[] = $array2;
     }
