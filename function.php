@@ -610,7 +610,9 @@
       {
         $tags_str .= $tag . ',';
       }
-      $tags_str = substr($tags_str, 0, -1);
+      if ($tags_str != '') {
+        $tags_str = substr($tags_str, 0, -1);
+      }
       $array2 = array($item['id'], $item['name'], $operator, $date, $item['duration'], $emotional, $categories, $tags_str);
 
       if (!empty($item['info'])) $result[] = $array2;
